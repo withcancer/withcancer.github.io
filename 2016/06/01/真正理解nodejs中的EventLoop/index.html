@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":45,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="nodejs是基于的事件的平台。这意味着node中发生的一切都是对事件的反应。事务通过node遍历一个级联的回调。在node.js里，任何异步方法（除timer,close,setImmediate之外）完成时，都会将其callback加到poll queue里,并立即执行。 远离开发层面，这些功能都是由一个叫做libuv的库提供的。 Eventloop可能是nodejs中最被人所误解的一个概念。">
+<meta name="keywords" content="前端,javascript,nodejs,eventloop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="真正理解nodejs中的EventLoop">
+<meta property="og:url" content="https://withcancer.github.io/2016/06/01/真正理解nodejs中的EventLoop/index.html">
+<meta property="og:site_name" content="没城">
+<meta property="og:description" content="nodejs是基于的事件的平台。这意味着node中发生的一切都是对事件的反应。事务通过node遍历一个级联的回调。在node.js里，任何异步方法（除timer,close,setImmediate之外）完成时，都会将其callback加到poll queue里,并立即执行。 远离开发层面，这些功能都是由一个叫做libuv的库提供的。 Eventloop可能是nodejs中最被人所误解的一个概念。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-02-28T07:52:20.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="真正理解nodejs中的EventLoop">
+<meta name="twitter:description" content="nodejs是基于的事件的平台。这意味着node中发生的一切都是对事件的反应。事务通过node遍历一个级联的回调。在node.js里，任何异步方法（除timer,close,setImmediate之外）完成时，都会将其callback加到poll queue里,并立即执行。 远离开发层面，这些功能都是由一个叫做libuv的库提供的。 Eventloop可能是nodejs中最被人所误解的一个概念。">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://withcancer.github.io/2016/06/01/真正理解nodejs中的EventLoop/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>真正理解nodejs中的EventLoop | 没城</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="jumbotron"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">没城</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">别怨社会太黑暗，只因你我没担当</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://withcancer.github.io/2016/06/01/真正理解nodejs中的EventLoop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="withcancer">
+      <meta itemprop="description" content="God Is In His Heaven. All's Right With The World">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="没城">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">真正理解nodejs中的EventLoop
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-06-01 00:00:00" itemprop="dateCreated datePublished" datetime="2016-06-01T00:00:00+08:00">2016-06-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-02-28 15:52:20" itemprop="dateModified" datetime="2018-02-28T15:52:20+08:00">2018-02-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/前端/" itemprop="url" rel="index"><span itemprop="name">前端</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/前端/nodejs/" itemprop="url" rel="index"><span itemprop="name">nodejs</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>nodejs是基于的事件的平台。这意味着node中发生的一切都是对事件的反应。事务通过node遍历一个级联的回调。在node.js里，任何异步方法（除timer,close,setImmediate之外）完成时，都会将其callback加到poll queue里,并立即执行。</p>
+<p>远离开发层面，这些功能都是由一个叫做libuv的库提供的。</p>
+<p>Eventloop可能是nodejs中最被人所误解的一个概念。<br><a id="more"></a></p>
+<h2 id="一般的错误认识"><a href="#一般的错误认识" class="headerlink" title="一般的错误认识"></a>一般的错误认识</h2><h3 id="错误认识-eventloop运行于一个单独的相对独立于用户代码的线程中"><a href="#错误认识-eventloop运行于一个单独的相对独立于用户代码的线程中" class="headerlink" title="错误认识: eventloop运行于一个单独的相对独立于用户代码的线程中"></a>错误认识: eventloop运行于一个单独的相对独立于用户代码的线程中</h3><ul>
+<li>错误：eventloop运行于一个相对独立于用户代码的线程中。有一个专门运行eventloop的线程，同时有一个运行用户代码的主线程。每当有异步操作时，主线程将工作交给事件循环线程，一旦完成，事件循环线程将ping主线程执行回调。</li>
+<li>正确：只有一个线程执行JavaScript代码，这是事件循环运行的线程。回调函数的执行（Node.js中每个用户的代码都是一个回调）是由事件循环做。稍后会更深入地讨论这个问题。</li>
+</ul>
+<h3 id="错误认识：异步操作由一个线程池处理"><a href="#错误认识：异步操作由一个线程池处理" class="headerlink" title="错误认识：异步操作由一个线程池处理"></a>错误认识：异步操作由一个线程池处理</h3><ul>
+<li>错误：异步操作，如IO工作，HTTP请求或与数据库总是由libuv线程池来装载。</li>
+<li>正确：libuv默认情况下创建一个有四个线程的线程池线来加载异步工作。今天的操作系统已经为许多I/O任务提供异步接口。只要有可能，libuv将使用这些异步接口，避免线程池的使用。这同样适用于像数据库这样的第三方子系统。驱动程序的作者宁愿使用异步接口，也不愿意使用线程池。简言之：只有在没有其他方法的情况下，线程池才会被用于异步I/O。</li>
+</ul>
+<h3 id="错误认识：eventloop就像栈或队列"><a href="#错误认识：eventloop就像栈或队列" class="headerlink" title="错误认识：eventloop就像栈或队列"></a>错误认识：eventloop就像栈或队列</h3><ul>
+<li>错误：事件循环按FIFO不断地遍历异步任务，并在任务完成时执行回调。</li>
+<li>虽然有类似队列的结构，但事件循环并没有完全类似于栈。事件循环作为一个过程，是一组由特定任务组成的按循环方式处理的过程。</li>
+</ul>
+<h2 id="理解事件循环处理过程"><a href="#理解事件循环处理过程" class="headerlink" title="理解事件循环处理过程"></a>理解事件循环处理过程</h2><p>要真正理解事件循环，我们必须了解哪些工作是在哪个阶段完成的。下图展示了这一过程：</p>
+<p>这一过程由以下几个部分组成：</p>
+<h3 id="计时器"><a href="#计时器" class="headerlink" title="计时器"></a>计时器</h3><p>任何由setTimeout()或setInerval()定时的操作都会在这里执行。</p>
+<h3 id="IO回调"><a href="#IO回调" class="headerlink" title="IO回调"></a>IO回调</h3><p>这里大部分的回调函数将被处理。所有的用户代码在Node.js基本上是在回调（例如一个回调函数传入的HTTP请求会触发一个级联的回调），这是用户的代码。</p>
+<h3 id="IO轮询"><a href="#IO轮询" class="headerlink" title="IO轮询"></a>IO轮询</h3><p>对下一次运行将要处理的新事件的轮询。<br>有两个主要方法：</p>
+<ul>
+<li>执行下限时间已经达到的timers的回调</li>
+<li>处理poll队列中的事件</li>
+</ul>
+<p>当事件循环进入poll阶段，并且没有timers被设定时，将发生两种情况之一：</p>
+<ul>
+<li>如果poll队列不空，事件循环将遍历其回调执行同步直到队列中的回调都被调用，或者达到系统上限。</li>
+<li>如果poll队列是空的，那么两个事件中的一个将会发生：</li>
+<li><ul>
+<li>如果脚本被setImmdiate()定时器定时，eventloop将会结束poll阶段，并进入下一个阶段</li>
+</ul>
+</li>
+<li><ul>
+<li>如果代码不被setimmediate()定时器定时，事件循环会等待回调被添加到队列中，然后立刻执行它们。</li>
+</ul>
+</li>
+</ul>
+<p>如果poll队列为空，eventloop将会检查哪些timers的已经到期。如果有一个或多个timer到期，eventloop将会回到timers阶段去执行回调。</p>
+<h3 id="Set-Immediate"><a href="#Set-Immediate" class="headerlink" title="Set Immediate"></a>Set Immediate</h3><p>运行所有由setImmediate()发起的操作。</p>
+<h3 id="Close"><a href="#Close" class="headerlink" title="Close"></a>Close</h3><p>这里是所有的(close)事件回调的处理。</p>
+<p>例如有以下代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">someAsyncOperation</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 假设需要95ms</span></span><br><span class="line">  fs.readFile(<span class="string">'/path/to/file'</span>, callback);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> timeoutScheduled = <span class="built_in">Date</span>.now();</span><br><span class="line"></span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> delay = <span class="built_in">Date</span>.now() - timeoutScheduled;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;delay&#125;</span>ms have passed since I was scheduled`</span>);</span><br><span class="line">&#125;, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">someAsyncOperation(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> startCallback = <span class="built_in">Date</span>.now();</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">while</span> (<span class="built_in">Date</span>.now() - startCallback &lt; <span class="number">10</span>) &#123;</span><br><span class="line">    <span class="comment">// do nothing</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>console最终的输出为105毫秒，它的过程是这样的：</p>
+<ol>
+<li>当eventloop来到poll阶段时，它的队列为空，因为此时readFile还没有结束。所以它将等待最新的timer到期。</li>
+<li>95ms后，readFile结束，callback执行还需要另外的10ms。</li>
+<li>callback执行结束，因为队列中已经没有了其他的callback,它将回到timers阶段，setTimeOut()执行callback，得到105ms。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="withcancer wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎随时骚扰~</div>
+</div>
+
+    
+
+    
+      
+    
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>withcancer</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://withcancer.github.io/2016/06/01/真正理解nodejs中的EventLoop/" title="真正理解nodejs中的EventLoop">https://withcancer.github.io/2016/06/01/真正理解nodejs中的EventLoop/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+            <a href="/tags/nodejs/" rel="tag"># nodejs</a>
+          
+            <a href="/tags/eventloop/" rel="tag"># eventloop</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/" rel="next" title="Angular 利用ng-zorro实现全局http错误拦截与提示">
+                <i class="fa fa-chevron-left"></i> Angular 利用ng-zorro实现全局http错误拦截与提示
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/01/JAVA并发编程之Synchronized/" rel="prev" title="JAVA并发编程之Synchronized">
+                JAVA并发编程之Synchronized <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="withcancer">
+            
+              <p class="site-author-name" itemprop="name">withcancer</p>
+              <div class="site-description motion-element" itemprop="description">God Is In His Heaven. All's Right With The World</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一般的错误认识"><span class="nav-number">1.</span> <span class="nav-text">一般的错误认识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#错误认识-eventloop运行于一个单独的相对独立于用户代码的线程中"><span class="nav-number">1.1.</span> <span class="nav-text">错误认识: eventloop运行于一个单独的相对独立于用户代码的线程中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误认识：异步操作由一个线程池处理"><span class="nav-number">1.2.</span> <span class="nav-text">错误认识：异步操作由一个线程池处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误认识：eventloop就像栈或队列"><span class="nav-number">1.3.</span> <span class="nav-text">错误认识：eventloop就像栈或队列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#理解事件循环处理过程"><span class="nav-number">2.</span> <span class="nav-text">理解事件循环处理过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#计时器"><span class="nav-number">2.1.</span> <span class="nav-text">计时器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO回调"><span class="nav-number">2.2.</span> <span class="nav-text">IO回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO轮询"><span class="nav-number">2.3.</span> <span class="nav-text">IO轮询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Set-Immediate"><span class="nav-number">2.4.</span> <span class="nav-text">Set Immediate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Close"><span class="nav-number">2.5.</span> <span class="nav-text">Close</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">withcancer</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.0"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

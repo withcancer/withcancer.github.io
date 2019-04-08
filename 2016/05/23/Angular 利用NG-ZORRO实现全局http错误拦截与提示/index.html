@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":45,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="拦截http错误http全局错误的拦截可以采用先扩展Http类，重写请求方法后发出错误，之后实现ErrorHandler类来实现。下面是部分关键代码：">
+<meta name="keywords" content="前端,angular,ng-zorro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Angular 利用ng-zorro实现全局http错误拦截与提示">
+<meta property="og:url" content="https://withcancer.github.io/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/index.html">
+<meta property="og:site_name" content="没城">
+<meta property="og:description" content="拦截http错误http全局错误的拦截可以采用先扩展Http类，重写请求方法后发出错误，之后实现ErrorHandler类来实现。下面是部分关键代码：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-04-08T05:39:34.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Angular 利用ng-zorro实现全局http错误拦截与提示">
+<meta name="twitter:description" content="拦截http错误http全局错误的拦截可以采用先扩展Http类，重写请求方法后发出错误，之后实现ErrorHandler类来实现。下面是部分关键代码：">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://withcancer.github.io/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Angular 利用ng-zorro实现全局http错误拦截与提示 | 没城</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="jumbotron"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">没城</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">别怨社会太黑暗，只因你我没担当</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://withcancer.github.io/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="withcancer">
+      <meta itemprop="description" content="God Is In His Heaven. All's Right With The World">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="没城">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Angular 利用ng-zorro实现全局http错误拦截与提示
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-05-23 00:00:00" itemprop="dateCreated datePublished" datetime="2016-05-23T00:00:00+08:00">2016-05-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-08 13:39:34" itemprop="dateModified" datetime="2019-04-08T13:39:34+08:00">2019-04-08</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/前端/" itemprop="url" rel="index"><span itemprop="name">前端</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/前端/angular/" itemprop="url" rel="index"><span itemprop="name">angular</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="拦截http错误"><a href="#拦截http错误" class="headerlink" title="拦截http错误"></a>拦截http错误</h1><p>http全局错误的拦截可以采用先扩展<code>Http</code>类，重写请求方法后发出错误，之后实现<code>ErrorHandler</code>类来实现。<br>下面是部分关键代码：<br><a id="more"></a><br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> InterceptedHttp <span class="keyword">extends</span> Http &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params"></span></span><br><span class="line"><span class="params">        backend: ConnectionBackend, </span></span><br><span class="line"><span class="params">        defaultOptions: RequestOptions</span>) &#123;</span><br><span class="line">        <span class="keyword">super</span>(backend, defaultOptions);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    request(url: <span class="built_in">string</span> | Request, options?: RequestOptionsArgs): Observable&lt;Response&gt; &#123;</span><br><span class="line">        <span class="comment">// 在此处可以写一些拦截请求的操作</span></span><br><span class="line">        <span class="keyword">this</span>.updateUrl(url);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.request(url, options);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">get</span>(url: <span class="built_in">string</span>, options?: RequestOptionsArgs): Observable&lt;Response&gt; &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.get(url, <span class="keyword">this</span>.getRequestOptionArgs(options));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ....</span><br><span class="line">    <span class="comment">// 改写请求url,加上req</span></span><br><span class="line">    <span class="keyword">private</span> updateUrl(req: <span class="built_in">string</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>  <span class="string">"/api/"</span> + req;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 改写请求头部</span></span><br><span class="line">    <span class="keyword">private</span> getRequestOptionArgs(options?: RequestOptionsArgs) : RequestOptionsArgs &#123;</span><br><span class="line">        <span class="keyword">if</span> (options == <span class="literal">null</span>) &#123;</span><br><span class="line">            options = <span class="keyword">new</span> RequestOptions();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (options.headers == <span class="literal">null</span>) &#123;</span><br><span class="line">            options.headers = <span class="keyword">new</span> Headers();</span><br><span class="line">        &#125;</span><br><span class="line">        options.headers.append(<span class="string">'Content-Type'</span>, <span class="string">'application/json'</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> options;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上是一个简单的http请求拦截器，它可以改写请求参数，改写请求头部，还有一种写法是实现<code>HttpInterceptor</code>接口（angular5新添加)。<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> MyHttpInterceptor <span class="keyword">implements</span> HttpInterceptor &#123;</span><br><span class="line"><span class="keyword">constructor</span>(<span class="params"></span>) &#123; &#125;</span><br><span class="line"></span><br><span class="line">intercept(req: HttpRequest&lt;<span class="built_in">any</span>&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;<span class="built_in">any</span>&gt;&gt; &#123;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"intercepted request ... "</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Clone the request to add the new header.</span></span><br><span class="line"><span class="keyword">const</span> authReq = req.clone(&#123; headers: req.headers.set(<span class="string">"headerName"</span>, <span class="string">"headerValue"</span>)&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"Sending request with new header now ..."</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//send the newly created request</span></span><br><span class="line"><span class="keyword">return</span> next.handle(authReq)</span><br><span class="line">.catch(<span class="function">(<span class="params">error, caught</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">//intercept the respons error and displace it to the console</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Error Occurred"</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">    <span class="comment">//return the error to the method that called it</span></span><br><span class="line">    <span class="keyword">return</span> Observable.throw(error);</span><br><span class="line">&#125;) <span class="keyword">as</span> <span class="built_in">any</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接下来实现ErrorHandler类，它可以捕捉各种类型的错误，包括Http请求错误。<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> CustomErrorHandler <span class="keyword">implements</span> ErrorHandler &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params"> <span class="meta">@Inject</span>(NotificationService) <span class="keyword">private</span> notificationService: NotificationService</span>) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    handleError(error: <span class="built_in">any</span>): <span class="built_in">void</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> msg = <span class="keyword">this</span>.httpErrorHandler(error.rejection || error);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    httpErrorHandler(err): <span class="built_in">string</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> message = <span class="string">''</span>;</span><br><span class="line">        <span class="keyword">if</span> (err.status) &#123;</span><br><span class="line">            <span class="keyword">switch</span> (err.status) &#123;</span><br><span class="line">                <span class="keyword">case</span> <span class="number">502</span>:</span><br><span class="line">                <span class="keyword">case</span> <span class="number">500</span>:</span><br><span class="line">                    message = <span class="string">`服务器故障 : \n详细信息 : <span class="subst">$&#123;err.statusText&#125;</span>:<span class="subst">$&#123;err.json().message&#125;</span>`</span>;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> <span class="number">401</span>:</span><br><span class="line">                    message = <span class="string">`<span class="subst">$&#123;err.json().message&#125;</span>`</span></span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">default</span>:</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            message = err.message;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> message;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="发送错误消息"><a href="#发送错误消息" class="headerlink" title="发送错误消息"></a>发送错误消息</h1><p>捕捉到错误信息以后，需要通知某个服务来显示消息，利用nzMessageService将其显示出来，nzMessageService显示时需要视图载体，这里采用AppComponent作为载体。</p>
+<p>为ErrorHandler添加错误通知功能<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">handleError(error: <span class="built_in">any</span>): <span class="built_in">void</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> msg = <span class="keyword">this</span>.httpErrorHandler(error.rejection || error);</span><br><span class="line">    <span class="keyword">this</span>.notificationService.error(msg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>notificationService必须类似于EventEmitter一样，收到消息后自动发射到接受方，所以可以采用Subject来作为Message的主体，让Message可以被订阅，也可以被按需求发射。</p>
+<p>Message的模型如下:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> Message&#123;</span><br><span class="line">    <span class="keyword">type</span>: <span class="built_in">string</span>;</span><br><span class="line">    message: <span class="built_in">string</span>;</span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params"><span class="keyword">type</span>, message</span>)&#123;</span><br><span class="line">        <span class="keyword">this</span>.type = <span class="keyword">type</span>;</span><br><span class="line">        <span class="keyword">this</span>.message = message;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> NotificationService &#123;</span><br><span class="line">    <span class="keyword">public</span> message: Subject&lt;Message&gt; = <span class="keyword">new</span> Subject&lt;Message&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error(message: <span class="built_in">string</span>): <span class="built_in">void</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.message.next(<span class="keyword">new</span> Message(<span class="string">'error'</span>, message));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后，只要在AppComponent中订阅Message，就可以在前台进行提示了！<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent <span class="keyword">implements</span> OnInit &#123;</span><br><span class="line">  title = <span class="string">'app'</span>;</span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> notification: NotificationService,</span></span><br><span class="line"><span class="params">    <span class="keyword">private</span> nzMessageService: NzMessageService</span>) &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ngOnInit()&#123;</span><br><span class="line">    <span class="keyword">this</span>.notification.message.distinctUntilChanged().subscribe(<span class="function">(<span class="params">msg</span>)=&gt;</span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.nzMessageService.create(msg.type, msg.message);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后，注册以上这几个服务到AppModule中。<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">httpFactory</span>(<span class="params">xhrBackend: XHRBackend, requestOptions: RequestOptions</span>): <span class="title">Http</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> InterceptedHttp(xhrBackend, requestOptions);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">providers: [</span><br><span class="line">    &#123;</span><br><span class="line">      provide: Http,</span><br><span class="line">      useFactory: httpFactory,</span><br><span class="line">      deps: [XHRBackend, RequestOptions]</span><br><span class="line">    &#125;,</span><br><span class="line">    NotificationService, <span class="comment">// added</span></span><br><span class="line">    &#123; provide: ErrorHandler, useClass: CustomErrorHandler &#125;,</span><br><span class="line">    NzMessageService,</span><br><span class="line">    &#123; provide: NZ_MESSAGE_CONFIG, useValue: &#123; nzDuration: <span class="number">7000</span> &#125; &#125;</span><br><span class="line">  ],</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="withcancer wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎随时骚扰~</div>
+</div>
+
+    
+
+    
+      
+    
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>withcancer</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://withcancer.github.io/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/" title="Angular 利用ng-zorro实现全局http错误拦截与提示">https://withcancer.github.io/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/angular/" rel="tag"># angular</a>
+          
+            <a href="/tags/ng-zorro/" rel="tag"># ng-zorro</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/21/Angular5 JWT验证/" rel="next" title="Angular5 jwt验证">
+                <i class="fa fa-chevron-left"></i> Angular5 jwt验证
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/01/真正理解nodejs中的EventLoop/" rel="prev" title="真正理解nodejs中的EventLoop">
+                真正理解nodejs中的EventLoop <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="withcancer">
+            
+              <p class="site-author-name" itemprop="name">withcancer</p>
+              <div class="site-description motion-element" itemprop="description">God Is In His Heaven. All's Right With The World</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#拦截http错误"><span class="nav-number">1.</span> <span class="nav-text">拦截http错误</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#发送错误消息"><span class="nav-number">2.</span> <span class="nav-text">发送错误消息</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">withcancer</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.0"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

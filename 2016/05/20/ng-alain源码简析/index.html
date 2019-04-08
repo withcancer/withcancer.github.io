@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":45,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="外围配置Dockerfile12345678910111213141516171819202122232425262728293031323334# STEP 1: Build// copy package.json和lock到当前工作目录// node执行install,把创建好的./node_modules复制到新创建的ng-alain文件夹下// 设置工作目录为/ng-alain// 拷贝所">
+<meta name="keywords" content="前端,源码,ng-alain">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ng-alain源码简析">
+<meta property="og:url" content="https://withcancer.github.io/2016/05/20/ng-alain源码简析/index.html">
+<meta property="og:site_name" content="没城">
+<meta property="og:description" content="外围配置Dockerfile12345678910111213141516171819202122232425262728293031323334# STEP 1: Build// copy package.json和lock到当前工作目录// node执行install,把创建好的./node_modules复制到新创建的ng-alain文件夹下// 设置工作目录为/ng-alain// 拷贝所">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-04-08T05:39:58.523Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ng-alain源码简析">
+<meta name="twitter:description" content="外围配置Dockerfile12345678910111213141516171819202122232425262728293031323334# STEP 1: Build// copy package.json和lock到当前工作目录// node执行install,把创建好的./node_modules复制到新创建的ng-alain文件夹下// 设置工作目录为/ng-alain// 拷贝所">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://withcancer.github.io/2016/05/20/ng-alain源码简析/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ng-alain源码简析 | 没城</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="jumbotron"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">没城</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">别怨社会太黑暗，只因你我没担当</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://withcancer.github.io/2016/05/20/ng-alain源码简析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="withcancer">
+      <meta itemprop="description" content="God Is In His Heaven. All's Right With The World">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="没城">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ng-alain源码简析
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-05-20 00:00:00" itemprop="dateCreated datePublished" datetime="2016-05-20T00:00:00+08:00">2016-05-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-08 13:39:58" itemprop="dateModified" datetime="2019-04-08T13:39:58+08:00">2019-04-08</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/前端/" itemprop="url" rel="index"><span itemprop="name">前端</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/前端/angular/" itemprop="url" rel="index"><span itemprop="name">angular</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="外围配置"><a href="#外围配置" class="headerlink" title="外围配置"></a>外围配置</h1><h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># STEP 1: Build</span><br><span class="line">// copy package.json和lock到当前工作目录</span><br><span class="line">// node执行install,把创建好的./node_modules复制到新创建的ng-alain文件夹下</span><br><span class="line">// 设置工作目录为/ng-alain</span><br><span class="line">// 拷贝所有源文件到工作目录中</span><br><span class="line">FROM node:8-alpine as builder</span><br><span class="line"></span><br><span class="line">LABEL authors=&quot;cipchk &lt;cipchk@qq.com&gt;&quot;</span><br><span class="line"></span><br><span class="line">COPY package.json package-lock.json ./</span><br><span class="line"></span><br><span class="line">RUN npm set progress=false &amp;&amp; npm config set depth 0 &amp;&amp; npm cache clean --force</span><br><span class="line">RUN npm i &amp;&amp; mkdir /ng-alain &amp;&amp; cp -R ./node_modules ./ng-alain</span><br><span class="line"></span><br><span class="line">WORKDIR /ng-alain</span><br><span class="line"></span><br><span class="line">COPY . .</span><br><span class="line"></span><br><span class="line">RUN npm run build</span><br><span class="line"></span><br><span class="line"># STEP 2: Setup</span><br><span class="line">// 拷贝nginx配置，ssl配置到nginx中</span><br><span class="line">// 拷贝/ng-alain下的dist目录到nginx文件夹</span><br><span class="line">// 运行nginx对页面进行代理</span><br><span class="line">FROM nginx:1.13.5-alpine</span><br><span class="line"></span><br><span class="line">COPY --from=builder /ng-alain/_nginx/default.conf /etc/nginx/conf.d/default.conf</span><br><span class="line">COPY --from=builder /ng-alain/_nginx/ssl/* /etc/nginx/ssl/</span><br><span class="line"></span><br><span class="line">RUN rm -rf /usr/share/nginx/html/*</span><br><span class="line"></span><br><span class="line">COPY --from=builder /ng-alain/dist /usr/share/nginx/html</span><br><span class="line"></span><br><span class="line">CMD [ &quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="nginx配置"><a href="#nginx配置" class="headerlink" title="nginx配置"></a>nginx配置</h2><p>配置了端口80，虚拟主机名localhost，主目录/usr/share/nginx/html，首页index.html，错误处理画面50x.html<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    # listen 443;</span><br><span class="line">    # ssl on;</span><br><span class="line">    # ssl_certificate /etc/nginx/ssl/server.crt;</span><br><span class="line">    # ssl_certificate_key /etc/nginx/ssl/server.key;</span><br><span class="line"></span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    #charset koi8-r;</span><br><span class="line">    #access_log  /var/log/nginx/host.access.log  main;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        root   /usr/share/nginx/html;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    #error_page  404              /404.html;</span><br><span class="line"></span><br><span class="line">    # redirect server error pages to the static page /50x.html</span><br><span class="line">    #</span><br><span class="line">    error_page   500 502 503 504  /50x.html;</span><br><span class="line">    location = /50x.html &#123;</span><br><span class="line">        root   /usr/share/nginx/html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker compose"></a>docker compose</h2><p>简单的使用上面的dockerfile进行build，并传入环境变量NODE_ENV:production</p>
+<h1 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h1><p>ng-alain由以下几大模块组成：</p>
+<ul>
+<li>core</li>
+<li>layout</li>
+<li>routes</li>
+<li>shared</li>
+</ul>
+<h2 id="core模块"><a href="#core模块" class="headerlink" title="core模块"></a>core模块</h2><p>core模块首先提供了i18n服务，下面来看ng-alain是如何实现i18n转换的：</p>
+<ol>
+<li><p>I18NService实现了AlainI18NService接口，这个接口是这样定义的：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> AlainI18NService &#123;</span><br><span class="line">    [key: <span class="built_in">string</span>]: <span class="built_in">any</span>;</span><br><span class="line">    use(lang: <span class="built_in">string</span>, firstLoad: <span class="built_in">boolean</span>): <span class="built_in">void</span>;</span><br><span class="line">    getLangs(): <span class="built_in">any</span>[];</span><br><span class="line">    fanyi(key: <span class="built_in">string</span>): <span class="built_in">any</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>构造方法中调用<code>ngx-translate</code>的<code>addLangs</code>方法来增加可选语言。<code>use</code>方法内设置了ng-zorro的国际化，如果是初次加载时，需要重新刷新页面，也就是重定向到<code>/</code>，<code>use</code>方法的最后，调用了<code>ngx-translate</code>的<code>use</code>方法。这样，就可以使用<code>assets/i18n</code>中的文件，然后利用模板内的<code>translate</code>标识符进行翻译。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export function HttpLoaderFactory(http: HttpClient) &#123;</span><br><span class="line">    return new TranslateHttpLoader(http, `assets/i18n/`, &apos;.json&apos;);</span><br><span class="line">&#125;.</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>接下来，core模块实现了http拦截器，通过对<code>HttpInterceptor</code>接口的实现，将错误全部导入<code>handleData</code>方法进行处理，然后根据错误代码导向不同的页面。</p>
+<p>最后，core模块制作了一个初始化器，用来加载app内必要的数据。然后设置应用信息，用户信息，初始化菜单等，这期间，调用了@delon theme中的几个服务，例如：<code>MenuService,SettingsService，TitleService</code>，这几个服务将会贯穿整个app的始终。</p>
+<h2 id="layout模块"><a href="#layout模块" class="headerlink" title="layout模块"></a>layout模块</h2><p>layout模块制定了页面布局，也就是以下几个部分：</p>
+<ul>
+<li>header </li>
+<li>sidebar</li>
+<li>passport</li>
+<li>default: 页面的标准布局</li>
+</ul>
+<p>其中，header，sidebar的每一个部分都是一个独立的组件，这两个模块的详细解析放在专门章节解读。</p>
+<p>passport模块定义了路由插槽，login,register两个模块可以在passport模块上来回切换。</p>
+<p>default页面的布局如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"wrapper"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"router-progress-bar"</span> *<span class="attr">ngIf</span>=<span class="string">"isFetching"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">app-header</span> <span class="attr">class</span>=<span class="string">"header"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-header</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">app-sidebar</span> <span class="attr">class</span>=<span class="string">"aside"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-sidebar</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">section</span> <span class="attr">class</span>=<span class="string">"content"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 引用自@delon/abc/reuse-tab --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">reuse-tab</span>&gt;</span><span class="tag">&lt;/<span class="name">reuse-tab</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">router-outlet</span>&gt;</span><span class="tag">&lt;/<span class="name">router-outlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">section</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>default模块内订阅了router事件，当发生错误时停止<code>router-progress-bar</code>的滚动，100毫秒后隐藏<code>progress-bar</code>，它的css在@delon/theme/styles/app/router-progress-bar.less中。</p>
+<h2 id="routes模块"><a href="#routes模块" class="headerlink" title="routes模块"></a>routes模块</h2><p>routes模块中定义了整个app的路由表和对应的组件，事实上把路由表与组件分开会让src的结构更加清晰。</p>
+<h2 id="shared模块"><a href="#shared模块" class="headerlink" title="shared模块"></a>shared模块</h2><p>将常用模块包装后又导出。跟正常的shared模块的用途一致。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="withcancer wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎随时骚扰~</div>
+</div>
+
+    
+
+    
+      
+    
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>withcancer</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://withcancer.github.io/2016/05/20/ng-alain源码简析/" title="ng-alain源码简析">https://withcancer.github.io/2016/05/20/ng-alain源码简析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/ng-alain/" rel="tag"># ng-alain</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/20/ES6中的迭代协议-Sympol.iterator/" rel="next" title="ES6的迭代协议-Sympol.iterator">
+                <i class="fa fa-chevron-left"></i> ES6的迭代协议-Sympol.iterator
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/21/Angular5 自定义管道与指令/" rel="prev" title="Angular5 自定义管道与指令">
+                Angular5 自定义管道与指令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="withcancer">
+            
+              <p class="site-author-name" itemprop="name">withcancer</p>
+              <div class="site-description motion-element" itemprop="description">God Is In His Heaven. All's Right With The World</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#外围配置"><span class="nav-number">1.</span> <span class="nav-text">外围配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile"><span class="nav-number">1.1.</span> <span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx配置"><span class="nav-number">1.2.</span> <span class="nav-text">nginx配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-compose"><span class="nav-number">1.3.</span> <span class="nav-text">docker compose</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结构"><span class="nav-number">2.</span> <span class="nav-text">结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#core模块"><span class="nav-number">2.1.</span> <span class="nav-text">core模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#layout模块"><span class="nav-number">2.2.</span> <span class="nav-text">layout模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#routes模块"><span class="nav-number">2.3.</span> <span class="nav-text">routes模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shared模块"><span class="nav-number">2.4.</span> <span class="nav-text">shared模块</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">withcancer</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.0"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

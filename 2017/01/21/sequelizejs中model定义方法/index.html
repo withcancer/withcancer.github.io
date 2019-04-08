@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":45,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="以下是对sequelize.define方法的详解： 可以为define方法添加getter,setter">
+<meta name="keywords" content="javascript,后端,sequelizejs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sequelizejs中model定义方法">
+<meta property="og:url" content="https://withcancer.github.io/2017/01/21/sequelizejs中model定义方法/index.html">
+<meta property="og:site_name" content="没城">
+<meta property="og:description" content="以下是对sequelize.define方法的详解： 可以为define方法添加getter,setter">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-02-28T08:24:23.743Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sequelizejs中model定义方法">
+<meta name="twitter:description" content="以下是对sequelize.define方法的详解： 可以为define方法添加getter,setter">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://withcancer.github.io/2017/01/21/sequelizejs中model定义方法/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>sequelizejs中model定义方法 | 没城</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="jumbotron"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">没城</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">别怨社会太黑暗，只因你我没担当</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://withcancer.github.io/2017/01/21/sequelizejs中model定义方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="withcancer">
+      <meta itemprop="description" content="God Is In His Heaven. All's Right With The World">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="没城">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">sequelizejs中model定义方法
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-01-21 00:00:00" itemprop="dateCreated datePublished" datetime="2017-01-21T00:00:00+08:00">2017-01-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-02-28 16:24:23" itemprop="dateModified" datetime="2018-02-28T16:24:23+08:00">2018-02-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/后端/" itemprop="url" rel="index"><span itemprop="name">后端</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/后端/sequelizejs/" itemprop="url" rel="index"><span itemprop="name">sequelizejs</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>以下是对sequelize.define方法的详解：</p>
+<h1 id="可以为define方法添加getter-setter"><a href="#可以为define方法添加getter-setter" class="headerlink" title="可以为define方法添加getter,setter"></a>可以为define方法添加getter,setter</h1><a id="more"></a>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Employee = sequelize.define(<span class="string">'employee'</span>, &#123;</span><br><span class="line">  name: &#123;</span><br><span class="line">    type: Sequelize.STRING,</span><br><span class="line">    allowNull: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// 字段内的get方法</span></span><br><span class="line">    <span class="keyword">get</span>() &#123;</span><br><span class="line">      <span class="keyword">const</span> title = <span class="keyword">this</span>.getDataValue(<span class="string">'title'</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.getDataValue(<span class="string">'name'</span>) + <span class="string">' ('</span> + title + <span class="string">')'</span>;</span><br><span class="line">      <span class="comment">// this.getDataValue是内建的help方法，用来取得字段的值</span></span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  title: &#123;</span><br><span class="line">    type: Sequelize.STRING,</span><br><span class="line">    allowNull: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// 字段内的set方法</span></span><br><span class="line">    <span class="keyword">set</span>(val) &#123;</span><br><span class="line">      <span class="keyword">this</span>.setDataValue(<span class="string">'title'</span>, val.toUpperCase());</span><br><span class="line">      <span class="comment">// 同上</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="如果要后台检验值时，可以使用model内的validations"><a href="#如果要后台检验值时，可以使用model内的validations" class="headerlink" title="如果要后台检验值时，可以使用model内的validations"></a>如果要后台检验值时，可以使用model内的validations</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// msg属性可以作为错误信息传递到前台</span></span><br><span class="line"><span class="keyword">const</span> ValidateMe = sequelize.define(<span class="string">'foo'</span>, &#123;</span><br><span class="line">  foo: &#123;</span><br><span class="line">    type: Sequelize.STRING,</span><br><span class="line">    validate: &#123;</span><br><span class="line">      is: [<span class="string">"^[a-z]+$"</span>,<span class="string">'i'</span>],     <span class="comment">// will only allow letters</span></span><br><span class="line">      is: <span class="regexp">/^[a-z]+$/i</span>,          <span class="comment">// same as the previous example using real RegExp</span></span><br><span class="line">      not: [<span class="string">"[a-z]"</span>,<span class="string">'i'</span>],       <span class="comment">// will not allow letters</span></span><br><span class="line">      isEmail: <span class="literal">true</span>,            <span class="comment">// checks for email format (foo@bar.com)</span></span><br><span class="line">      isUrl: <span class="literal">true</span>,              <span class="comment">// checks for url format (http://foo.com)</span></span><br><span class="line">      isIP: <span class="literal">true</span>,               <span class="comment">// checks for IPv4 (129.89.23.1) or IPv6 format</span></span><br><span class="line">      isIPv4: <span class="literal">true</span>,             <span class="comment">// checks for IPv4 (129.89.23.1)</span></span><br><span class="line">      isIPv6: <span class="literal">true</span>,             <span class="comment">// checks for IPv6 format</span></span><br><span class="line">      isAlpha: <span class="literal">true</span>,            <span class="comment">// will only allow letters</span></span><br><span class="line">      isAlphanumeric: <span class="literal">true</span>,     <span class="comment">// will only allow alphanumeric characters, so "_abc" will fail</span></span><br><span class="line">      isNumeric: <span class="literal">true</span>,          <span class="comment">// will only allow numbers</span></span><br><span class="line">      isInt: <span class="literal">true</span>,              <span class="comment">// checks for valid integers</span></span><br><span class="line">      isFloat: <span class="literal">true</span>,            <span class="comment">// checks for valid floating point numbers</span></span><br><span class="line">      isDecimal: <span class="literal">true</span>,          <span class="comment">// checks for any numbers</span></span><br><span class="line">      isLowercase: <span class="literal">true</span>,        <span class="comment">// checks for lowercase</span></span><br><span class="line">      isUppercase: <span class="literal">true</span>,        <span class="comment">// checks for uppercase</span></span><br><span class="line">      notNull: <span class="literal">true</span>,            <span class="comment">// won't allow null</span></span><br><span class="line">      isNull: <span class="literal">true</span>,             <span class="comment">// only allows null</span></span><br><span class="line">      notEmpty: <span class="literal">true</span>,           <span class="comment">// don't allow empty strings</span></span><br><span class="line">      equals: <span class="string">'specific value'</span>, <span class="comment">// only allow a specific value</span></span><br><span class="line">      contains: <span class="string">'foo'</span>,          <span class="comment">// force specific substrings</span></span><br><span class="line">      notIn: [[<span class="string">'foo'</span>, <span class="string">'bar'</span>]],  <span class="comment">// check the value is not one of these</span></span><br><span class="line">      isIn: [[<span class="string">'foo'</span>, <span class="string">'bar'</span>]],   <span class="comment">// check the value is one of these</span></span><br><span class="line">      notContains: <span class="string">'bar'</span>,       <span class="comment">// don't allow specific substrings</span></span><br><span class="line">      len: [<span class="number">2</span>,<span class="number">10</span>],              <span class="comment">// only allow values with length between 2 and 10</span></span><br><span class="line">      isUUID: <span class="number">4</span>,                <span class="comment">// only allow uuids</span></span><br><span class="line">      isDate: <span class="literal">true</span>,             <span class="comment">// only allow date strings</span></span><br><span class="line">      isAfter: <span class="string">"2011-11-05"</span>,    <span class="comment">// only allow date strings after a specific date</span></span><br><span class="line">      isBefore: <span class="string">"2011-11-05"</span>,   <span class="comment">// only allow date strings before a specific date</span></span><br><span class="line">      max: <span class="number">23</span>,                  <span class="comment">// only allow values &lt;= 23</span></span><br><span class="line">      min: <span class="number">23</span>,                  <span class="comment">// only allow values &gt;= 23</span></span><br><span class="line">      isCreditCard: <span class="literal">true</span>,       <span class="comment">// check for valid credit card numbers</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// custom validations are also possible:</span></span><br><span class="line">      isEven(value) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">parseInt</span>(value) % <span class="number">2</span> != <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Only even values are allowed!'</span>)</span><br><span class="line">          <span class="comment">// we also are in the model's context here, so this.otherField</span></span><br><span class="line">          <span class="comment">// would get the value of otherField if it existed</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="可以在表结构上附加Options"><a href="#可以在表结构上附加Options" class="headerlink" title="可以在表结构上附加Options"></a>可以在表结构上附加Options</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 不需要updatedAt, createdAt时填false</span></span><br><span class="line">  timestamps: <span class="literal">false</span>,</span><br><span class="line">  <span class="comment">// 在删除操作时，并不真正删除，而是设置deletedAt字段。必须和timestamps连用</span></span><br><span class="line">  paranoid: <span class="literal">true</span>,</span><br><span class="line">  <span class="comment">// 新加入的字段，例如updatedAt，由驼峰式改为下划线式，updated_at</span></span><br><span class="line">  underscored: <span class="literal">true</span>,</span><br><span class="line">  <span class="comment">// 禁止自动更改表名，用默认model名作为表名（即自动由单数转为复数）</span></span><br><span class="line">  freezeTableName: <span class="literal">true</span>,</span><br><span class="line">  <span class="comment">// 设置表名</span></span><br><span class="line">  tableName: <span class="string">'my_very_custom_table_name'</span>,</span><br><span class="line">  <span class="comment">// 增加version字段，设为true或者想要的字段名</span></span><br><span class="line">  version: <span class="literal">true</span></span><br><span class="line">  <span class="comment">// 不要createdAt</span></span><br><span class="line">  createdAt: <span class="literal">false</span>,</span><br><span class="line">  <span class="comment">// 把updatedAt改成updateTimestamp</span></span><br><span class="line">  updatedAt: <span class="string">'updateTimestamp'</span>,</span><br><span class="line">  <span class="comment">// 同理</span></span><br><span class="line">  deletedAt: <span class="string">'destroyTime'</span>,</span><br><span class="line">  <span class="comment">// engine，设置表引擎</span></span><br><span class="line">  engine: <span class="string">'MYISAM'</span></span><br><span class="line">  <span class="comment">// 设置表注释</span></span><br><span class="line">  comment: <span class="string">"I'm a table comment!"</span>,</span><br><span class="line">  <span class="comment">// 索引选项，用来生成表时建立索引</span></span><br><span class="line">   indexes: [</span><br><span class="line">    <span class="comment">// Create a unique index on email</span></span><br><span class="line">    &#123;</span><br><span class="line">      unique: <span class="literal">true</span>,</span><br><span class="line">      fields: [<span class="string">'email'</span>]</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Creates a gin index on data with the jsonb_path_ops operator</span></span><br><span class="line">    &#123;</span><br><span class="line">      fields: [<span class="string">'data'</span>],</span><br><span class="line">      using: <span class="string">'gin'</span>, <span class="comment">//PostgreSQL</span></span><br><span class="line">      operator: <span class="string">'jsonb_path_ops'</span></span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// By default index name will be [table]_[fields]</span></span><br><span class="line">    <span class="comment">// Creates a multi column partial index</span></span><br><span class="line">    &#123;</span><br><span class="line">      name: <span class="string">'public_by_author'</span>,</span><br><span class="line">      fields: [<span class="string">'author'</span>, <span class="string">'status'</span>], <span class="comment">//聚合索引，带有条件</span></span><br><span class="line">      where: &#123;</span><br><span class="line">        status: <span class="string">'public'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// A BTREE index with a ordered field</span></span><br><span class="line">    &#123;</span><br><span class="line">      name: <span class="string">'title_index'</span>,</span><br><span class="line">      method: <span class="string">'BTREE'</span>, <span class="comment">// 建立一个btree索引</span></span><br><span class="line">      fields: [<span class="string">'author'</span>, &#123;<span class="attr">attribute</span>: <span class="string">'title'</span>, <span class="attr">collate</span>: <span class="string">'en_US'</span>, <span class="attr">order</span>: <span class="string">'DESC'</span>, <span class="attr">length</span>: <span class="number">5</span>&#125;]</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line"></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="withcancer wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎随时骚扰~</div>
+</div>
+
+    
+
+    
+      
+    
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>withcancer</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://withcancer.github.io/2017/01/21/sequelizejs中model定义方法/" title="sequelizejs中model定义方法">https://withcancer.github.io/2017/01/21/sequelizejs中model定义方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+            <a href="/tags/后端/" rel="tag"># 后端</a>
+          
+            <a href="/tags/sequelizejs/" rel="tag"># sequelizejs</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/20/sequelizejs的数据类型/" rel="next" title="sequelizejs的数据类型">
+                <i class="fa fa-chevron-left"></i> sequelizejs的数据类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/21/sequelizejs中数据持久化的方法/" rel="prev" title="sequelizejs中数据持久化的方法">
+                sequelizejs中数据持久化的方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="withcancer">
+            
+              <p class="site-author-name" itemprop="name">withcancer</p>
+              <div class="site-description motion-element" itemprop="description">God Is In His Heaven. All's Right With The World</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#可以为define方法添加getter-setter"><span class="nav-number">1.</span> <span class="nav-text">可以为define方法添加getter,setter</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如果要后台检验值时，可以使用model内的validations"><span class="nav-number">2.</span> <span class="nav-text">如果要后台检验值时，可以使用model内的validations</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可以在表结构上附加Options"><span class="nav-number">3.</span> <span class="nav-text">可以在表结构上附加Options</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">withcancer</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.0"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

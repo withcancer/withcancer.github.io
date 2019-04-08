@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":45,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="首先写一个简单的bootstrap的登陆表单。新建loginComponent，然后在hmtl里写:">
+<meta name="keywords" content="angular,全栈,jwt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Angular5 jwt验证">
+<meta property="og:url" content="https://withcancer.github.io/2016/05/21/Angular5 JWT验证/index.html">
+<meta property="og:site_name" content="没城">
+<meta property="og:description" content="首先写一个简单的bootstrap的登陆表单。新建loginComponent，然后在hmtl里写:">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-03-06T05:18:31.158Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Angular5 jwt验证">
+<meta name="twitter:description" content="首先写一个简单的bootstrap的登陆表单。新建loginComponent，然后在hmtl里写:">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://withcancer.github.io/2016/05/21/Angular5 JWT验证/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Angular5 jwt验证 | 没城</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="jumbotron"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">没城</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">别怨社会太黑暗，只因你我没担当</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://withcancer.github.io/2016/05/21/Angular5 JWT验证/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="withcancer">
+      <meta itemprop="description" content="God Is In His Heaven. All's Right With The World">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="没城">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Angular5 jwt验证
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-05-21 00:00:00" itemprop="dateCreated datePublished" datetime="2016-05-21T00:00:00+08:00">2016-05-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-03-06 13:18:31" itemprop="dateModified" datetime="2018-03-06T13:18:31+08:00">2018-03-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/全栈/" itemprop="url" rel="index"><span itemprop="name">全栈</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/全栈/angular/" itemprop="url" rel="index"><span itemprop="name">angular</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>首先写一个简单的bootstrap的登陆表单。<br>新建loginComponent，然后在hmtl里写:<br><a id="more"></a><br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-6 col-md-offset-3"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h2</span>&gt;</span>Login<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"form"</span> (<span class="attr">ngSubmit</span>)=<span class="string">"f.form.valid &amp;&amp; login()"</span> #<span class="attr">f</span>=<span class="string">"ngForm"</span> <span class="attr">novalidate</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span> [<span class="attr">ngClass</span>]=<span class="string">"&#123; 'has-error': f.submitted &amp;&amp; !username.valid &#125;"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"username"</span>&gt;</span>Username<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">class</span>=<span class="string">"form-control"</span> <span class="attr">name</span>=<span class="string">"username"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"user.username"</span> #<span class="attr">username</span>=<span class="string">"ngModel"</span> <span class="attr">required</span> /&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">div</span> *<span class="attr">ngIf</span>=<span class="string">"f.submitted &amp;&amp; !username.valid"</span> <span class="attr">class</span>=<span class="string">"help-block"</span>&gt;</span>Username is required<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span> [<span class="attr">ngClass</span>]=<span class="string">"&#123; 'has-error': f.submitted &amp;&amp; !password.valid &#125;"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"password"</span>&gt;</span>Password<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="attr">class</span>=<span class="string">"form-control"</span> <span class="attr">name</span>=<span class="string">"password"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"user.password"</span> #<span class="attr">password</span>=<span class="string">"ngModel"</span> <span class="attr">required</span> /&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">div</span> *<span class="attr">ngIf</span>=<span class="string">"f.submitted &amp;&amp; !password.valid"</span> <span class="attr">class</span>=<span class="string">"help-block"</span>&gt;</span>Password is required<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">button</span> [<span class="attr">disabled</span>]=<span class="string">"loading"</span> <span class="attr">class</span>=<span class="string">"btn btn-primary"</span>&gt;</span>Login<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-spinner fa-spin"</span> *<span class="attr">ngIf</span>=<span class="string">"loading"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在loginComponent内写：<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> LoginComponent <span class="keyword">implements</span> OnInit &#123;</span><br><span class="line">    user: User = <span class="keyword">new</span> User();</span><br><span class="line">    loading = <span class="literal">false</span>;</span><br><span class="line">    error = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params"></span></span><br><span class="line"><span class="params">        <span class="keyword">private</span> router: Router,</span></span><br><span class="line"><span class="params">        <span class="keyword">private</span> authenticationService: AuthenticationService</span>) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    ngOnInit() &#123;</span><br><span class="line">        <span class="comment">// reset login status</span></span><br><span class="line">        <span class="keyword">this</span>.authenticationService.logout();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    login() &#123;</span><br><span class="line">        <span class="keyword">this</span>.loading = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">this</span>.authenticationService.login(<span class="keyword">this</span>.user)</span><br><span class="line">            .subscribe(<span class="function"><span class="params">result</span> =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (result === <span class="literal">true</span>) &#123;</span><br><span class="line">                    <span class="keyword">this</span>.router.navigate([<span class="string">'/'</span>]);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">this</span>.error = <span class="string">'Username or password is incorrect'</span>;</span><br><span class="line">                    <span class="keyword">this</span>.loading = <span class="literal">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,<span class="function"><span class="params">error</span>=&gt;</span>&#123;</span><br><span class="line">                <span class="keyword">this</span>.loading = <span class="literal">false</span>;</span><br><span class="line">            &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>UserModel的代码：<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> User&#123;</span><br><span class="line">    id: <span class="built_in">number</span>;</span><br><span class="line">    username: <span class="built_in">string</span>;</span><br><span class="line">    password: <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>login后，要根据用户名密码来在后台签名，签名结果token返回前台，前台接收到token后，存储到localstorage中，然后以后每次请求时，都要带上token作为头部。<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> User = <span class="built_in">require</span>(<span class="string">'../models/user.model'</span>);</span><br><span class="line"><span class="keyword">const</span> jwt = <span class="built_in">require</span>(<span class="string">'jsonwebtoken'</span>);</span><br><span class="line"><span class="keyword">const</span> secret = <span class="built_in">require</span>(<span class="string">'../secret'</span>);</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">login</span>(<span class="params">ctx</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; query &#125; = ctx.request</span><br><span class="line">  <span class="keyword">let</span> user = <span class="keyword">await</span> User.find(&#123;where: &#123;id: query.id&#125;&#125;);</span><br><span class="line">  <span class="keyword">if</span> (query.password === user.password) &#123;</span><br><span class="line">    ctx.status = <span class="number">200</span></span><br><span class="line">    ctx.body = &#123;</span><br><span class="line">      message: <span class="string">'登录成功'</span>,</span><br><span class="line">      user: user,</span><br><span class="line">      token: jwt.sign(&#123;</span><br><span class="line">        data: user,</span><br><span class="line">        exp: <span class="built_in">Math</span>.floor(<span class="built_in">Date</span>.now() / <span class="number">1000</span>) + (<span class="number">60</span> * <span class="number">60</span>), <span class="comment">// 60 seconds * 60 minutes = 1 hour</span></span><br><span class="line">      &#125;, secret),</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> err = <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Password Error'</span>);</span><br><span class="line">    err.status = <span class="number">401</span>;</span><br><span class="line">    err.message = <span class="string">`密码错误`</span>;</span><br><span class="line">    <span class="keyword">throw</span> err;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123; login &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>koa-jwt添加进来以后，引入公钥，然后排除login api：<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jwt(&#123; secret: secret &#125;).unless(&#123; path: [<span class="regexp">/^\/api\/login/</span>] &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>这样，当前台发出请求时，就会得到签名过的token，为了统一处理，写一个共通处理的httpinterceptor，这里面用到了<code>ngx-notify</code>。<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> DefaultHttpInterceptor <span class="keyword">implements</span> HttpInterceptor &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> auth: AuthenticationService, <span class="keyword">private</span> notifyService: NotifyService</span>) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    intercept(req: HttpRequest&lt;<span class="built_in">any</span>&gt;, next: HttpHandler): Observable&lt;HttpSentEvent | HttpHeaderResponse | HttpProgressEvent | HttpResponse&lt;<span class="built_in">any</span>&gt; | HttpUserEvent&lt;<span class="built_in">any</span>&gt;&gt; &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> url = req.url;</span><br><span class="line">        <span class="keyword">if</span> (!url.startsWith(<span class="string">'https://'</span>) &amp;&amp; !url.startsWith(<span class="string">'http://'</span>)) &#123;</span><br><span class="line">            url = environment.api + url;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">let</span> options = &#123; url: url &#125;;</span><br><span class="line">        <span class="keyword">if</span> (!url.includes(<span class="string">'login'</span>)) &#123;</span><br><span class="line">            options[<span class="string">'setHeaders'</span>] = &#123;</span><br><span class="line">                Authorization: <span class="string">`Bearer <span class="subst">$&#123;this.auth.getToken()&#125;</span>`</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">const</span> newReq = req.clone(options);</span><br><span class="line">        <span class="keyword">const</span> started = <span class="built_in">Date</span>.now();</span><br><span class="line">        <span class="keyword">return</span> next.handle(newReq).pipe(</span><br><span class="line">            tap(<span class="function"><span class="params">event</span> =&gt;</span> &#123;</span><br><span class="line">              <span class="keyword">if</span> (event <span class="keyword">instanceof</span> HttpResponse) &#123;</span><br><span class="line">                <span class="keyword">const</span> elapsed = <span class="built_in">Date</span>.now() - started;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="string">`Request for <span class="subst">$&#123;req.urlWithParams&#125;</span> took <span class="subst">$&#123;elapsed&#125;</span> ms.`</span>);</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;, <span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">switch</span> (error.status) &#123;</span><br><span class="line">                    <span class="keyword">case</span> <span class="number">401</span>:</span><br><span class="line">                        <span class="comment">// 权限处理</span></span><br><span class="line">                        <span class="keyword">this</span>.notifyService.error(<span class="string">'401'</span>, <span class="string">`错误代码为：<span class="subst">$&#123;error.message&#125;</span>`</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> <span class="number">404</span>:</span><br><span class="line">                        <span class="keyword">this</span>.notifyService.error(<span class="string">'404'</span>, <span class="string">`API不存在`</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> <span class="number">500</span>:</span><br><span class="line">                        <span class="keyword">this</span>.notifyService.error(<span class="string">'500'</span>, error.message);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>过程中遇到的坑：</p>
+<ol>
+<li>httpinterceptor只支持httpClient而不支持http。</li>
+<li>koa-jwt只支持自动校验，不支持sign。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="withcancer wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎随时骚扰~</div>
+</div>
+
+    
+
+    
+      
+    
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>withcancer</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://withcancer.github.io/2016/05/21/Angular5 JWT验证/" title="Angular5 jwt验证">https://withcancer.github.io/2016/05/21/Angular5 JWT验证/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/angular/" rel="tag"># angular</a>
+          
+            <a href="/tags/全栈/" rel="tag"># 全栈</a>
+          
+            <a href="/tags/jwt/" rel="tag"># jwt</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/21/Angular5 表单/" rel="next" title="Angular5 表单">
+                <i class="fa fa-chevron-left"></i> Angular5 表单
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/23/Angular 利用NG-ZORRO实现全局http错误拦截与提示/" rel="prev" title="Angular 利用ng-zorro实现全局http错误拦截与提示">
+                Angular 利用ng-zorro实现全局http错误拦截与提示 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="withcancer">
+            
+              <p class="site-author-name" itemprop="name">withcancer</p>
+              <div class="site-description motion-element" itemprop="description">God Is In His Heaven. All's Right With The World</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">withcancer</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.0"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
